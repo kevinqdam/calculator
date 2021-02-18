@@ -97,7 +97,8 @@ button:active {
 
 .operation, 
 .clear, 
-.delete {
+.delete,
+.equals {
   color: #F1C40F;
 }
 
