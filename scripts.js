@@ -2,7 +2,10 @@ const MAX_SCREEN_LENGTH = 15;
 const plus = (a, b) => a + b;
 const minus = (a, b) => a - b;
 const multiply = (a, b) => a * b;
-const divide = (a, b) => a / b;
+const divide = (a, b) => {
+  if (b === 0) return 'ERROR:DIV/0';
+  return a / b;
+};
 let active;
 const subscreen = document.querySelector('.subscreen');
 const screen = document.querySelector('.screen');
@@ -23,34 +26,42 @@ function subscreenEndsWithDecimal() {
 
 function subscreenEndsWithOperation() {
   return (subscreen.textContent.endsWith(' + ')
-    || subscreen.textContent.endsWith(' - ')
-    || subscreen.textContent.endsWith(' × ')
-    || subscreen.textContent.endsWith(' ÷ '));
+      || subscreen.textContent.endsWith(' - ')
+      || subscreen.textContent.endsWith(' × ')
+      || subscreen.textContent.endsWith(' ÷ '));
+}
+
+function roundNumber(num) {
+  if (num.length <= MAX_SCREEN_LENGTH) return num;
+  if (num.indexOf('.') >= 0) return Number.parseFloat(num).toExponential(2).toString();
+  return Number.parseInt(num, 10).toExponential(2).toString();
 }
 
 function handleSubscreenForInput() {
+  if (screen.textContent === 'ERROR:DIV/0') return;
   if (screen.textContent.length >= MAX_SCREEN_LENGTH) return;
   if (subscreenEndsWithDecimal() && active.textContent === '.') return;
-  if (subscreen.textContent === '0'
-      || subscreen.textContent.slice(-1) === '=') {
+  if (subscreen.textContent === '0' || subscreen.textContent.slice(-1) === '=') {
     subscreen.textContent = '';
   }
   if (subscreen.textContent === '' && active.textContent === '.') subscreen.textContent = '0.';
+  else if (screen.textContent === '0.' && active.textContent === '.') subscreen.textContent += '0.';
   else subscreen.textContent += active.textContent;
   subscreen.textContent = subscreen.textContent.trimLeft();
 }
 
 function handleScreenForInput() {
-  if (screen.textContent.length >= MAX_SCREEN_LENGTH) return;
-  if (screenEndsWithDecimal() && active.textContent === '.') return;
+  if (screen.textContent === 'ERROR:DIV/0') return;
   if (screen.textContent === '0'
       || subscreen.textContent.slice(-1) === '='
       || subscreenEndsWithOperation()) {
     screen.textContent = '';
   }
+  if (screen.textContent.length >= MAX_SCREEN_LENGTH) return;
+  if (screenEndsWithDecimal() && active.textContent === '.') return;
   if (screen.textContent === '' && active.textContent === '.') screen.textContent = '0.';
   else screen.textContent += active.textContent;
-  screen.textContent = screen.textContent.trimLeft();
+  screen.textContent = roundNumber(screen.textContent.trimLeft());
 }
 
 function clearSelectedStyling() {
@@ -70,7 +81,8 @@ function handleScreenDelete() {
 }
 
 function strToNum(str) {
-  if (str.indexOf('.') >= 0) return Number.parseFloat(str.trim());
+  if (!str) return 0;
+  if (str.indexOf('.') >= 0 || str.indexOf('e') >= 0) return Number.parseFloat(str.trim());
   return Number.parseInt(str.trim(), 10);
 }
 
@@ -87,8 +99,11 @@ function parseSubscreen() {
     const [a, b] = subscreen.textContent.split(' × ');
     return [strToNum(a), strToNum(b), multiply];
   }
-  const [a, b] = subscreen.textContent.split(' ÷ ');
-  return [strToNum(a), strToNum(b), divide];
+  if (subscreen.textContent.indexOf('  ') >= 0) {
+    const [a, b] = subscreen.textContent.split(' ÷ ');
+    return [strToNum(a), strToNum(b), divide];
+  }
+  return [0, 0, plus];
 }
 
 function evaluateSubscreen() {
@@ -97,7 +112,31 @@ function evaluateSubscreen() {
   return result;
 }
 
+function isNotClearingError() {
+  return (screen.textContent.indexOf('ERROR') >= 0 && active.id !== 'clear');
+}
+
+function isMidOperation() {
+  return (subscreen.textContent.endsWith(' + ')
+      || subscreen.textContent.endsWith(' - ')
+      || subscreen.textContent.endsWith(' × ')
+      || subscreen.textContent.endsWith(' ÷ '));
+}
+
+function isPendingEqualsOperation() {
+  return (subscreen.textContent.split(' + ').length > 1
+      || subscreen.textContent.split(' - ').length > 1
+      || subscreen.textContent.split(' × ').length > 1
+      || subscreen.textContent.split(' ÷ ').length > 1);
+}
+
 function handleScreenForOperation() {
+  if (isNotClearingError()) return;
+  if (isMidOperation() && active.id === 'equals') return;
+  if (isPendingEqualsOperation()
+      && active.id !== 'equals'
+      && active.id !== 'clear'
+      && active.id !== 'delete') return;
   switch (active.id) {
     case 'clear':
       clear();
@@ -114,7 +153,7 @@ function handleScreenForOperation() {
     case 'divide':
       break;
     case 'equals':
-      screen.textContent = evaluateSubscreen().toString();
+      screen.textContent = roundNumber(evaluateSubscreen().toString());
       break;
     default:
       clear();
@@ -128,12 +167,14 @@ function handleSubscreenDelete() {
   if (subscreen.textContent.length === 0) subscreen.textContent = '0';
 }
 
-function handleSubscreenSerialCalculation() {
-  if (subscreen.textContent.slice(-1) === '=') subscreen.textContent = screen.textContent;
-}
-
 function handleSubscreenForOperation() {
-  handleSubscreenSerialCalculation();
+  if (isNotClearingError()) return;
+  if (subscreenEndsWithOperation()) return;
+  if (subscreen.textContent.endsWith('=')) subscreen.textContent = screen.textContent;
+  if (isPendingEqualsOperation()
+      && active.id !== 'equals'
+      && active.id !== 'clear'
+      && active.id !== 'delete') return;
   switch (active.id) {
     case 'clear':
       clear();
@@ -154,7 +195,7 @@ function handleSubscreenForOperation() {
       subscreen.textContent += ' ÷ ';
       break;
     case 'equals':
-      subscreen.textContent += ' =';
+      if (isPendingEqualsOperation()) subscreen.textContent += ' =';
       break;
     default:
       subscreen.textContent = 'ERROR';
@@ -162,20 +203,23 @@ function handleSubscreenForOperation() {
   }
 }
 
-function handleSelectedStylingForOperation() {
-  if (active.id !== 'plus'
-      && active.id !== 'minus'
-      && active.id !== 'multiply'
-      && active.id !== 'divide') clearSelectedStyling();
-}
-
 function handleOperation() {
   handleScreenForOperation();
   handleSubscreenForOperation();
-  handleSelectedStylingForOperation();
+  clearSelectedStyling();
 }
 
-function isOperation() {
+function isOperation(...args) {
+  if (args.length === 1) {
+    const btnId = args[0];
+    return (btnId === 'clear'
+        || btnId === 'delete'
+        || btnId === 'plus'
+        || btnId === 'minus'
+        || btnId === 'multiply'
+        || btnId === 'divide'
+        || btnId === 'equals');
+  }
   return (active.id === 'clear'
       || active.id === 'delete'
       || active.id === 'plus'
@@ -193,8 +237,17 @@ function selectButtonOfKey(e) {
   return button;
 }
 
+function isDeletingAResult(btnId) {
+  return (subscreen.textContent.endsWith('=') && btnId === 'delete');
+}
+
 function handleClickEvent(btn) {
   if (!btn) return;
+  if (isDeletingAResult(btn.id)) return;
+  if (isMidOperation()
+      && isOperation(btn.id)
+      && btn.id !== 'clear'
+      && btn.id !== 'delete') return;
   btn.classList.add('selected');
   active = btn;
   if (!isOperation()) handleDisplayForInput();
