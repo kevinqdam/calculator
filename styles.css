@@ -8,12 +8,21 @@ html, body {
 body {
   display: grid;
   grid-template: 
-    ".   .          .          .            ." 3rem
-    ".   .          heading    .            ." 4rem
-    ".   .          .          .            ." 8rem
-    ".   calculator calculator calculator   ." 500px 
-    ".   .          .          .            ." auto /
-     1fr 20px       300px      20px         1fr;
+    ".   .          ." auto
+    ".   heading    ." 3rem
+    ".   .          ." 8rem
+    ".   calculator ." 1.875fr 
+    ".   .          ." auto /
+     1fr 1fr        1fr;
+}
+@media (max-height: 1000px) {
+  body {
+    grid-template:
+      ".   .          ." auto
+      ".   calculator ." 1.875fr 
+      ".   .          ." auto /
+      1fr  1fr        1fr;
+  }
 }
 
 .heading {
@@ -23,6 +32,12 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 40pt;
   font-weight: lighter;
+  padding-top: 8rem;
+}
+@media (max-height: 1000px) {
+  .heading {
+    display: none;
+  }
 }
 
 main {
@@ -46,12 +61,12 @@ main {
   border-width: thin;
   border-color: #D5D8DC;
   box-shadow:
-  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
-  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
-  0 12.5px 10px rgba(0, 0, 0, 0.06),
-  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
-  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
-  0 100px 80px rgba(0, 0, 0, 0.12);
+    0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+    0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+    0 12.5px 10px rgba(0, 0, 0, 0.06),
+    0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+    0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+    0 100px 80px rgba(0, 0, 0, 0.12);
 }
 
 button {
