@@ -7,51 +7,11 @@ html, body {
 
 body {
   display: grid;
-  grid-template: 
-    ".   .          ." auto
-    ".   heading    ." 3rem
-    ".   .          ." 8rem
-    ".   calculator ." 1.875fr 
-    ".   .          ." auto /
-     1fr 1fr        1fr;
-}
-@media (max-width: 700px) {
-  body {
-    grid-template:
+  grid-template:
       ".   .          ." auto
       ".   calculator ." 1.875fr 
       ".   .          ." auto /
       1fr  1fr        1fr;
-  }
-}
-@media (max-height: 1000px) {
-  body {
-    grid-template:
-      ".   .          ." auto
-      ".   calculator ." 1.875fr 
-      ".   .          ." auto /
-      1fr  1fr        1fr;
-  }
-}
-
-.heading {
-  grid-area: heading;
-  justify-self: center;
-  align-self: center;
-  font-family: 'Source Sans Pro', sans-serif;
-  font-size: 40pt;
-  font-weight: lighter;
-  padding-top: 8rem;
-}
-@media (max-width: 700px) {
-  .heading {
-    display: none;
-  }
-}
-@media (max-height: 1000px) {
-  .heading {
-    display: none;
-  }
 }
 
 main {
