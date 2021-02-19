@@ -6,7 +6,7 @@ const divide = (a, b) => {
   if (b === 0) return 'ERROR:DIV/0';
   return a / b;
 };
-let active;
+let active = null;
 const subscreen = document.querySelector('.subscreen');
 const screen = document.querySelector('.screen');
 const buttons = Array.from(document.querySelectorAll('button'));
@@ -99,7 +99,7 @@ function parseSubscreen() {
     const [a, b] = subscreen.textContent.split(' × ');
     return [strToNum(a), strToNum(b), multiply];
   }
-  if (subscreen.textContent.indexOf('  ') >= 0) {
+  if (subscreen.textContent.indexOf(' ÷ ') >= 0) {
     const [a, b] = subscreen.textContent.split(' ÷ ');
     return [strToNum(a), strToNum(b), divide];
   }
