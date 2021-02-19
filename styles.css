@@ -13,7 +13,7 @@ body {
     ".   .          .          .            ." 8rem
     ".   calculator calculator calculator   ." 500px 
     ".   .          .          .            ." auto /
-     1fr 1fr        300px      1fr          1fr;
+     1fr 20px       300px      20px         1fr;
 }
 
 .heading {
@@ -71,7 +71,7 @@ button:active {
   background-color: #EAECEE;
 }
 
-.curr-inp {
+.subscreen {
   grid-area: inp;
   background-color: #FFFFFF;
   font-family: 'Source Sans Pro', sans-serif;
@@ -97,11 +97,7 @@ button:active {
 }
 
 .operation, 
-.clear, 
-.delete, 
-.number, 
-.decimal, 
-.equals {
+.scr-inp {
   color: #585858;
   padding: 35px;
   font-size: 18pt;
@@ -109,21 +105,19 @@ button:active {
   font-weight: bold;
 }
 
-.operation, 
-.clear, 
-.delete,
-.equals {
+.operation {
   color: #F1C40F;
 }
 
-.number {
+.selected {
+  background-color: #EAECEE;
 }
 
-.clear {
+#clear{
   grid-area: c;
 }
 
-.delete {
+#delete {
   grid-area: del;
 }
 
@@ -131,7 +125,7 @@ button:active {
   grid-area: plus;
 }
 
-#subtract {
+#minus {
   grid-area: minus;
 }
 
@@ -144,12 +138,14 @@ button:active {
   margin-bottom: 0px;
 }
 
-.decimal {
+#decimal {
   grid-area: dcm;
   margin-top: 0px;
+  font-weight: bold;
+  font-size: large;
 }
 
-.equals {
+#equals {
   grid-area: equals;
   margin-top: 0px;
 }
